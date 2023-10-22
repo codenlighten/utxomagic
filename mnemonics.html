@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>BSV UXO MAGIC- UTXO SPLITTER</title>
+
+		<!-- bsv cdn unpkg  -->
+		<script src="https://unpkg.com/bsv@1.5"></script>
+		<!-- bsv mnemonic library -->
+		<script src="https://cdn.jsdelivr.net/npm/bsv@1.5.0/bsv-mnemonic.min.js"></script>
+		<style>
+			body {
+				background-color: #f1f1f1;
+				font-family: Arial, Helvetica, sans-serif;
+			}
+
+			h1 {
+				color: #000;
+				font-size: 2.5rem;
+			}
+
+			p {
+				color: #000;
+				font-size: 1.5rem;
+			}
+
+			input[type="text"],
+			select,
+			textarea {
+				width: 100%;
+				padding: 12px;
+				border: 1px solid #ccc;
+				border-radius: 4px;
+				resize: vertical;
+			}
+
+			label {
+				padding: 12px 12px 12px 0;
+				display: inline-block;
+			}
+
+			button {
+				background-color: #4caf50;
+				color: white;
+				padding: 12px 20px;
+				border: none;
+				border-radius: 4px;
+				cursor: pointer;
+				float: right;
+			}
+
+			button:hover {
+				background-color: #45a049;
+			}
+
+			.container {
+				border-radius: 5px;
+				background-color: #f2f2f2;
+				padding: 20px;
+			}
+		</style>
+	</head>
+	<body>
+		<h1>BSV UXO MAGIC- Generate Mnemonic</h1>
+		<div id="generateMnemonic">
+			<select name="" id="languageSelect">
+				<option value="ENGLISH">ENGLISH</option>
+				<option value="SPANISH">SPANISH</option>
+				<option value="FRENCH">FRENCH</option>
+				<option value="ITALIAN">ITALIAN</option>
+				<option value="JAPANESE">JAPANESE</option>
+				<option value="KOREAN">KOREAN</option>
+				<option value="CHINESE_SIMPLIFIED">CHINESE_SIMPLIFIED</option>
+				<option value="CHINESE_TRADITIONAL">CHINESE_TRADITIONAL</option>
+			</select>
+			<button onclick="generateMnemonic()">Generate Mnemonic</button>
+			<div id="results">
+				<p id="words"></p>
+				<p id="privateKey"></p>
+				<p id="publicKey"></p>
+				<p id="address"></p>
+			</div>
+		</div>
+
+		<script>
+			// generate a fresh mnemonic phrase
+			const Mnemonic = bsv.Mnemonic;
+			const spanishWords = Mnemonic.Words.SPANISH;
+			const code = new Mnemonic(spanishWords);
+			console.log(code.toString());
+			const englishWords = Mnemonic.Words.ENGLISH;
+			const code2 = new Mnemonic(englishWords);
+			console.log(code2.toString());
+			const japaneseWords = Mnemonic.Words.JAPANESE;
+			const code3 = new Mnemonic(japaneseWords);
+			console.log(code3.toString());
+			const chineseSimplifiedWords = Mnemonic.Words.CHINESE_SIMPLIFIED;
+			const code4 = new Mnemonic(chineseSimplifiedWords);
+			console.log(code4.toString());
+			const chineseTraditionalWords = Mnemonic.Words.CHINESE_TRADITIONAL;
+			const code5 = new Mnemonic(chineseTraditionalWords);
+			console.log(code5.toString());
+			const frenchWords = Mnemonic.Words.FRENCH;
+			const code6 = new Mnemonic(frenchWords);
+			console.log(code6.toString());
+			const italianWords = Mnemonic.Words.ITALIAN;
+			const code7 = new Mnemonic(italianWords);
+			console.log(code7.toString());
+			const koreanWords = Mnemonic.Words.KOREAN;
+			const code8 = new Mnemonic(koreanWords);
+			console.log(code8.toString());
+			// generate a fresh mnemonic phrase
+			function generateMnemonic() {
+				const Mnemonic = bsv.Mnemonic;
+				let language = document.getElementById("languageSelect").value;
+				let code = new Mnemonic(Mnemonic.Words[language]);
+				console.log(code.toString());
+				document.getElementById("words").innerHTML = code.toString();
+				let hdPrivateKey = code.toHDPrivateKey();
+				let hdPublicKey = hdPrivateKey.hdPublicKey;
+				let address = hdPublicKey.publicKey.toAddress();
+				console.log(address.toString());
+				let publicKey = hdPublicKey.publicKey.toString();
+				console.log(publicKey);
+				let privateKey = hdPrivateKey.privateKey.toString();
+				console.log(privateKey);
+				document.getElementById("address").innerHTML = address.toString();
+				document.getElementById("publicKey").innerHTML = publicKey;
+				document.getElementById("privateKey").innerHTML = privateKey;
+				localStorage.setItem("mnemonic", code.toString());
+			}
+		</script>
+	</body>
+</html>

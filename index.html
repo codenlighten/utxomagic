@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>BSV UXO MAGIC- UTXO SPLITTER</title>
+
+		<!-- bsv cdn unpkg  -->
+		<script src="https://unpkg.com/bsv@1.5"></script>
+		<!-- bsv mnemonic library -->
+		<script src="https://cdn.jsdelivr.net/npm/bsv@1.5.0/bsv-mnemonic.min.js"></script>
+		<style>
+			body {
+				background-color: #f1f1f1;
+				font-family: Arial, Helvetica, sans-serif;
+			}
+
+			h1 {
+				color: #000;
+				font-size: 2.5rem;
+			}
+
+			p {
+				color: #000;
+				font-size: 1.5rem;
+			}
+
+			input[type="text"],
+			select,
+			textarea {
+				width: 100%;
+				padding: 12px;
+				border: 1px solid #ccc;
+				border-radius: 4px;
+				resize: vertical;
+			}
+
+			label {
+				padding: 12px 12px 12px 0;
+				display: inline-block;
+			}
+
+			button {
+				background-color: #4caf50;
+				color: white;
+				padding: 12px 20px;
+				border: none;
+				border-radius: 4px;
+				cursor: pointer;
+				float: right;
+			}
+
+			button:hover {
+				background-color: #45a049;
+			}
+
+			.container {
+				border-radius: 5px;
+				background-color: #f2f2f2;
+				padding: 20px;
+			}
+		</style>
+	</head>
+	<body>
+		<h1>BSV UXO MAGIC- UTXO SPLITTER</h1>
+		<p>Split your UTXOs into smaller UTXOs</p>
+		<p>Enter your mnemonic phrase and click the button to split your UTXOs</p>
+		<p>WARNING: This will split all UTXOs in your wallet</p>
+		<div class="mnemonics container">
+			<label for="">Add Mnemonic Phrase</label>
+			<input type="text" id="mnemonic" name="mnemonic" value="" />
+			<button onclick="addMnemonic()">Add Mnemonic</button>
+			<h2>Your Keys</h2>
+			<p>Address: <span id="address"></span></p>
+			<p>Public Key: <span id="publicKey"></span></p>
+			<p>Private Key: <span id="privateKey"></span></p>
+			<p>WIF: <span id="wif"></span></p>
+		</div>
+		<div class="retrieveFunds container">
+			<label for="">Retrieve Funds</label>
+			<input type="text" id="fundingAddress" name="address" value="" />
+			<button onclick="retrieveFunds()">Retrieve Funds</button>
+			<h2>UTXOs</h2>
+
+			<p id="totalSats">Total Sats: <span id="totalSats"></span></p>
+
+			<p id="totalNumUtxos">Total UTXOs: <span id="totalNumUtxos"></span></p>
+			<p>Results: <span id="utxos"></span></p>
+		</div>
+		<div class="container" id="splitUtxos">
+			<label for="">Value of UTXO Splits</label>
+			<input type="text" id="splitValue" name="splitValue" value="" />
+			<button onclick="splitUtxos()">Split UTXOs</button>
+			<h2>Results</h2>
+			<p>Results: <span id="splitResults"></span></p>
+			<div id="inputs">
+				<h2>Inputs</h2>
+			</div>
+			<div id="outputs">
+				<h2>Outputs</h2>
+			</div>
+		</div>
+		<script>
+			const Mnemonic = bsv.Mnemonic;
+
+			function addMnemonic() {
+				let mnemonic =
+					document.getElementById("mnemonic").value ||
+					localStorage.getItem("mnemonic");
+				let code = new Mnemonic(mnemonic);
+				let hdPrivateKey = code.toHDPrivateKey();
+				let hdPublicKey = hdPrivateKey.hdPublicKey;
+				let address = hdPublicKey.publicKey.toAddress();
+				console.log(address.toString());
+				let publicKey = hdPublicKey.publicKey.toString();
+				console.log(publicKey);
+				let privateKey = hdPrivateKey.privateKey.toString();
+				console.log(privateKey);
+				let wif = hdPrivateKey.privateKey.toWIF();
+				console.log(wif);
+				document.getElementById("fundingAddress").value = address.toString();
+				document.getElementById("address").innerHTML = address.toString();
+				document.getElementById("publicKey").innerHTML = publicKey;
+				document.getElementById("privateKey").innerHTML = privateKey;
+				document.getElementById("wif").innerHTML = wif;
+			}
+			// on dom load, check for mnemonic in local storage
+			window.onload = function () {
+				let mnemonic = localStorage.getItem("mnemonic");
+				if (mnemonic) {
+					document.getElementById("mnemonic").value = mnemonic;
+					addMnemonic();
+					retrieveFunds();
+				}
+			};
+			async function retrieveFunds() {
+				let address = document.getElementById("fundingAddress").value;
+				let utxos = await fetch(
+					`https://api.whatsonchain.com/v1/bsv/main/address/${address}/unspent`
+				);
+				let utxosJson = await utxos.json();
+				console.log(utxosJson);
+				if (utxosJson.length > 0) {
+					document.getElementById("utxos").innerHTML = `${JSON.stringify(
+						utxosJson
+					)}`;
+					let totalSats = utxosJson.reduce((a, b) => {
+						return a + b.value;
+					}, 0);
+					document.getElementById(
+						"totalSats"
+					).innerHTML = `Total Sats: ${totalSats}`;
+					document.getElementById(
+						"totalNumUtxos"
+					).innerHTML = `Total UTXOs: ${utxosJson.length}`;
+				} else {
+					document.getElementById(
+						"utxos"
+					).innerHTML = `No UTXOs found for ${address}`;
+				}
+			}
+
+			async function splitUtxos() {
+				let mnemonic =
+					document.getElementById("mnemonic").value ||
+					localStorage.getItem("mnemonic");
+				let code = new Mnemonic(mnemonic);
+				let hdPrivateKey = code.toHDPrivateKey();
+				let hdPublicKey = hdPrivateKey.hdPublicKey;
+				let address = hdPublicKey.publicKey.toAddress();
+				console.log(address.toString());
+				let publicKey = hdPublicKey.publicKey.toString();
+				console.log(publicKey);
+				let privateKey = hdPrivateKey.privateKey.toString();
+				console.log(privateKey);
+				let splitValue = document.getElementById("splitValue").value;
+				let utxos = await fetch(
+					`https://api.whatsonchain.com/v1/bsv/main/address/${address}/unspent`
+				);
+				console.log(utxos);
+				let utxosJson = await utxos.json();
+				let utxoArray = [];
+				for (let i = 0; i < utxosJson.length; i++) {
+					let utxo = utxosJson[i];
+					let txid = utxo.tx_hash;
+					let vout = utxo.tx_pos;
+					let satoshis = utxo.value;
+					let utxoObj = {
+						txid: txid,
+						vout: vout,
+						satoshis: satoshis,
+						script: bsv.Script.buildPublicKeyHashOut(address).toString(),
+					};
+					utxoArray.push(utxoObj);
+				}
+				const filteredUtxos = utxoArray.filter((utxo) => {
+					return utxo.satoshis > parseInt(splitValue);
+				});
+				const totalFilterdUtxos = filteredUtxos.reduce((a, b) => {
+					return a + b.satoshis;
+				}, 0);
+				const rounds = Math.floor(totalFilterdUtxos / splitValue);
+				const tx = new bsv.Transaction().from(filteredUtxos).change(address);
+				tx.feePerKb(50);
+				let totalSatsAvail = tx.inputAmount;
+				let estFee = tx._estimateFee();
+				for (let i = 0; i < rounds; i++) {
+					tx.to(address, parseInt(splitValue));
+					totalSatsAvail -= parseInt(splitValue);
+					estFee = tx._estimateFee();
+					console.log(totalSatsAvail);
+					console.log(estFee);
+					if (totalSatsAvail < estFee) {
+						console.log("not enough sats");
+						break;
+					}
+				}
+				console.log(tx);
+				tx.sign(privateKey);
+				console.log(tx);
+				const txid = await fetch(
+					"https://api.whatsonchain.com/v1/bsv/main/tx/raw",
+					{
+						method: "POST",
+						body: JSON.stringify({ txhex: tx.toString() }),
+						headers: {
+							"Content-Type": "application/json",
+						},
+					}
+				);
+				const txidJson = await txid.json();
+				console.log(txidJson);
+				document.getElementById("splitResults").innerHTML = `${JSON.stringify(
+					txidJson
+				)}`;
+				document.getElementById(
+					"inputs"
+				).innerHTML = `<h2>Inputs</h2><p>${JSON.stringify(tx.inputs)}</p>`;
+				document.getElementById(
+					"outputs"
+				).innerHTML = `<h2>Outputs</h2><p>${JSON.stringify(tx.outputs)}</p>`;
+			}
+		</script>
+	</body>
+</html>
