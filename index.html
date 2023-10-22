@@ -107,6 +107,11 @@
 				let mnemonic =
 					document.getElementById("mnemonic").value ||
 					localStorage.getItem("mnemonic");
+				if (!mnemonic) {
+					alert("Please enter a mnemonic phrase");
+					return;
+				}
+				localStorage.setItem("mnemonic", mnemonic);
 				let code = new Mnemonic(mnemonic);
 				let hdPrivateKey = code.toHDPrivateKey();
 				let hdPublicKey = hdPrivateKey.hdPublicKey;
