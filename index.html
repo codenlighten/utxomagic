@@ -90,6 +90,7 @@
 		<div class="container" id="splitUtxos">
 			<label for="">Value of UTXO Splits</label>
 			<input type="text" id="splitValue" name="splitValue" value="" />
+			<label for="receivingAddress">Receiving Address</label>
 			<button onclick="splitUtxos()">Split UTXOs</button>
 			<h2>Results</h2>
 			<p>Results: <span id="splitResults"></span></p>
@@ -123,6 +124,7 @@
 				console.log(privateKey);
 				let wif = hdPrivateKey.privateKey.toWIF();
 				console.log(wif);
+			     document.getElementById('receivingAddress').value = address.toString(
 				document.getElementById("fundingAddress").value = address.toString();
 				document.getElementById("address").innerHTML = address.toString();
 				document.getElementById("publicKey").innerHTML = publicKey;
@@ -209,8 +211,9 @@
 				tx.feePerKb(50);
 				let totalSatsAvail = tx.inputAmount;
 				let estFee = tx._estimateFee();
+			     const receivingAddress = document.getElementById('receivingAddress').value;
 				for (let i = 0; i < rounds; i++) {
-					tx.to(address, parseInt(splitValue));
+					tx.to(receivingAddress, parseInt(splitValue));
 					totalSatsAvail -= parseInt(splitValue);
 					estFee = tx._estimateFee();
 					console.log(totalSatsAvail);
