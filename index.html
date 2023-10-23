@@ -170,7 +170,8 @@
 					document.getElementById("pub").classList.toggle("hidden");
 					document.getElementById("priv").classList.toggle("hidden");
 					document.getElementById("wifstring").classList.toggle("hidden");
-					document.getElementById("addMnemonicBtn").innerHTML = "Show Mnemonic";
+					document.getElementById("addMnemonicBtn").innerHTML =
+						"Show Stored Mnemonic or Add New Mnemonic";
 					document.getElementById("addMnemonicBtn").onclick = function () {
 						addMnemonic();
 						document.getElementById("mnemonic").value = mnemonic;
