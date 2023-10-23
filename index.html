@@ -13,6 +13,7 @@
 			body {
 				background-color: #f1f1f1;
 				font-family: Arial, Helvetica, sans-serif;
+				word-wrap: break-word;
 			}
 
 			h1 {
@@ -64,8 +65,10 @@
 	<body>
 		<h1>BSV UTXO MAGIC- UTXO SPLITTER</h1>
 		<p>Split your UTXOs into smaller UTXOs</p>
-		<p>Enter your mnemonic phrase and click the button to split your UTXOs</p>
-		<p>WARNING: This will split all UTXOs in your wallet</p>
+		<p>Enter your mnemonic phrase to split your UTXOs</p>
+		<p>
+			WARNING: This will split UTXOs in your wallet According to Your Choices
+		</p>
 		<div class="mnemonics container">
 			<label for="">Add Mnemonic Phrase</label>
 			<input type="text" id="mnemonic" name="mnemonic" value="" />
@@ -90,6 +93,8 @@
 		<div class="container" id="splitUtxos">
 			<label for="">Value of UTXO Splits</label>
 			<input type="text" id="splitValue" name="splitValue" value="" />
+			<label for="" id="totalToSplit">Total Amount of Sats to Send</label>
+			<input type="text" id="totalToSplit" name="totalToSplit" value="" />
 			<label for="receivingAddress">Receiving Address</label>
 			<input
 				type="text"
@@ -186,6 +191,8 @@
 				console.log(publicKey);
 				let privateKey = hdPrivateKey.privateKey.toString();
 				console.log(privateKey);
+				let totalToSplit = document.getElementById("totalToSplit").value;
+
 				let splitValue = document.getElementById("splitValue").value;
 				let utxos = await fetch(
 					`https://api.whatsonchain.com/v1/bsv/main/address/${address}/unspent`
@@ -212,6 +219,11 @@
 				const totalFilterdUtxos = filteredUtxos.reduce((a, b) => {
 					return a + b.satoshis;
 				}, 0);
+				if (totalFilterdUtxos < parseInt(totalToSplit)) {
+					alert("Not enough sats to split");
+					return;
+				}
+
 				const rounds = Math.floor(totalFilterdUtxos / splitValue);
 				const tx = new bsv.Transaction().from(filteredUtxos).change(address);
 				tx.feePerKb(50);
@@ -221,11 +233,7 @@
 					document.getElementById("receivingAddress").value;
 				for (let i = 0; i < rounds; i++) {
 					tx.to(receivingAddress, parseInt(splitValue));
-					totalSatsAvail -= parseInt(splitValue);
-					estFee = tx._estimateFee();
-					console.log(totalSatsAvail);
-					console.log(estFee);
-					if (totalSatsAvail < estFee) {
+					if (tx.inputAmount > totalSatsAvail) {
 						console.log("not enough sats");
 						break;
 					}
