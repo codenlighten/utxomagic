@@ -82,7 +82,7 @@
 		<div class="retrieveFunds container">
 			<label for="">Retrieve Funds</label>
 			<input type="text" id="fundingAddress" name="address" value="" />
-			<button onclick="retrieveFunds()">Retrieve Funds</button>
+			<button id="retrieveBtn" onclick="retrieveFunds()">Retrieve Funds</button>
 			<h2>UTXOs</h2>
 
 			<p id="totalSats">Total Sats: <span id="totalSats"></span></p>
@@ -115,7 +115,7 @@
 		<div class="container" id="getHistory">
 			<label for="">Get History</label>
 			<input type="text" id="fundingHistoryAddress" name="address" value="" />
-			<button onclick="getHistory()">Get History</button>
+			<button id="historyBtn" onclick="getHistory()">Get History</button>
 			<h2>History</h2>
 			<p>Results: <span id="history"></span></p>
 		</div>
@@ -185,6 +185,15 @@
 						"utxos"
 					).innerHTML = `No UTXOs found for ${address}`;
 				}
+				//onclick to hide
+				document.getElementById("retrieveBtn").innerHTML = "Hide UTXOs";
+				document.getElementById("retrieveBtn").onclick = function () {
+					document.getElementById("utxos").innerHTML = "";
+					document.getElementById("retrieveBtn").innerHTML = "Retrieve Funds";
+					document.getElementById("retrieveBtn").onclick = function () {
+						retrieveFunds();
+					};
+				};
 			}
 			async function getHistory() {
 				let address = document.getElementById("fundingHistoryAddress").value;
@@ -196,6 +205,15 @@
 				document.getElementById("history").innerHTML = `${JSON.stringify(
 					historyJson
 				)}`;
+				//onclick to hide
+				document.getElementById("historyBtn").innerHTML = "Hide History";
+				document.getElementById("historyBtn").onclick = function () {
+					document.getElementById("history").innerHTML = "";
+					document.getElementById("historyBtn").innerHTML = "Get History";
+					document.getElementById("historyBtn").onclick = function () {
+						getHistory();
+					};
+				};
 			}
 
 			async function splitUtxos() {
