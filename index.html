@@ -112,6 +112,13 @@
 				<h2>Outputs</h2>
 			</div>
 		</div>
+		<div class="container" id="getHistory">
+			<label for="">Get History</label>
+			<input type="text" id="fundingHistoryAddress" name="address" value="" />
+			<button onclick="getHistory()">Get History</button>
+			<h2>History</h2>
+			<p>Results: <span id="history"></span></p>
+		</div>
 		<script>
 			const Mnemonic = bsv.Mnemonic;
 
@@ -135,6 +142,8 @@
 				console.log(privateKey);
 				let wif = hdPrivateKey.privateKey.toWIF();
 				console.log(wif);
+				document.getElementById("fundingHistoryAddress").value =
+					address.toString();
 				document.getElementById("receivingAddress").value = address.toString();
 				document.getElementById("fundingAddress").value = address.toString();
 				document.getElementById("address").innerHTML = address.toString();
@@ -176,6 +185,17 @@
 						"utxos"
 					).innerHTML = `No UTXOs found for ${address}`;
 				}
+			}
+			async function getHistory() {
+				let address = document.getElementById("fundingHistoryAddress").value;
+				let history = await fetch(
+					`https://api.whatsonchain.com/v1/bsv/main/address/${address}/history`
+				);
+				let historyJson = await history.json();
+				console.log(historyJson);
+				document.getElementById("history").innerHTML = `${JSON.stringify(
+					historyJson
+				)}`;
 			}
 
 			async function splitUtxos() {
