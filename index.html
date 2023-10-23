@@ -133,6 +133,14 @@
 					alert("Please enter a mnemonic phrase");
 					return;
 				}
+				if (
+					localStorage.getItem("mnemonic") &&
+					mnemonic !== localStorage.getItem("mnemonic")
+				) {
+					if (!confirm("Are you sure you want to change your mnemonic?")) {
+						return;
+					}
+				}
 				localStorage.setItem("mnemonic", mnemonic);
 				let code = new Mnemonic(mnemonic);
 				let hdPrivateKey = code.toHDPrivateKey();
