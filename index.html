@@ -60,6 +60,9 @@
 				background-color: #f2f2f2;
 				padding: 20px;
 			}
+			.hidden {
+				display: none;
+			}
 		</style>
 	</head>
 	<body>
@@ -72,12 +75,12 @@
 		<div class="mnemonics container">
 			<label for="">Add Mnemonic Phrase</label>
 			<input type="text" id="mnemonic" name="mnemonic" value="" />
-			<button onclick="addMnemonic()">Add Mnemonic</button>
+			<button id="addMnemonicBtn" onclick="addMnemonic()">Add Mnemonic</button>
 			<h2>Your Keys</h2>
 			<p>Address: <span id="address"></span></p>
-			<p>Public Key: <span id="publicKey"></span></p>
-			<p>Private Key: <span id="privateKey"></span></p>
-			<p>WIF: <span id="wif"></span></p>
+			<p id="pub">Public Key: <span id="publicKey"></span></p>
+			<p id="priv">Private Key: <span id="privateKey"></span></p>
+			<p id="wifstring">WIF: <span id="wif"></span></p>
 		</div>
 		<div class="retrieveFunds container">
 			<label for="">Retrieve Funds</label>
@@ -150,6 +153,24 @@
 				document.getElementById("publicKey").innerHTML = publicKey;
 				document.getElementById("privateKey").innerHTML = privateKey;
 				document.getElementById("wif").innerHTML = wif;
+				//onclick to hide
+				document.getElementById("addMnemonicBtn").innerHTML = "Hide Mnemonic";
+				//hide mnemonic, private key, public key, wif
+				document.getElementById("addMnemonicBtn").onclick = function () {
+					document.getElementById("mnemonic").value = "";
+					// document.getElementById("address").innerHTML = "";
+					document.getElementById("pub").classList.toggle("hidden");
+					document.getElementById("priv").classList.toggle("hidden");
+					document.getElementById("wifstring").classList.toggle("hidden");
+					document.getElementById("addMnemonicBtn").innerHTML = "Show Mnemonic";
+					document.getElementById("addMnemonicBtn").onclick = function () {
+						addMnemonic();
+						document.getElementById("mnemonic").value = mnemonic;
+						document.getElementById("pub").classList.toggle("hidden");
+						document.getElementById("priv").classList.toggle("hidden");
+						document.getElementById("wifstring").classList.toggle("hidden");
+					};
+				};
 			}
 			// on dom load, check for mnemonic in local storage
 			window.onload = function () {
