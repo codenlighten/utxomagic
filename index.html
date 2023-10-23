@@ -9,10 +9,15 @@
 		<script src="https://unpkg.com/bsv@1.5"></script>
 		<!-- bsv mnemonic library -->
 		<script src="https://cdn.jsdelivr.net/npm/bsv@1.5.0/bsv-mnemonic.min.js"></script>
+		<!-- montserrat -->
+		<link
+			href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300&display=swap"
+			rel="stylesheet"
+		/>
 		<style>
 			body {
 				background-color: #f1f1f1;
-				font-family: Arial, Helvetica, sans-serif;
+				font-family: "Montserrat", sans-serif;
 				word-wrap: break-word;
 			}
 
@@ -182,6 +187,21 @@
 					};
 				};
 			}
+			function generateMnemonic() {
+				const Mnemonic = bsv.Mnemonic;
+				let language = document.getElementById("languageSelect").value;
+				let code = new Mnemonic(Mnemonic.Words[language]);
+				console.log(code.toString());
+				document.getElementById("words").innerHTML = code.toString();
+				let hdPrivateKey = code.toHDPrivateKey();
+				let hdPublicKey = hdPrivateKey.hdPublicKey;
+				let address = hdPublicKey.publicKey.toAddress();
+				console.log(address.toString());
+				let publicKey = hdPublicKey.publicKey.toString();
+				console.log(publicKey);
+				let privateKey = hdPrivateKey.privateKey.toString();
+				document.getElementById("mnemonic").value = code.toString();
+			}
 			// on dom load, check for mnemonic in local storage
 			window.onload = function () {
 				let mnemonic = localStorage.getItem("mnemonic");
@@ -189,6 +209,8 @@
 					document.getElementById("mnemonic").value = mnemonic;
 					addMnemonic();
 					retrieveFunds();
+				} else {
+					generateMnemonic();
 				}
 			};
 			async function retrieveFunds() {
