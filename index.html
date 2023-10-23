@@ -189,8 +189,7 @@
 			}
 			function generateMnemonic() {
 				const Mnemonic = bsv.Mnemonic;
-				let language = document.getElementById("languageSelect").value;
-				let code = new Mnemonic(Mnemonic.Words[language]);
+				let code = new Mnemonic(Mnemonic.Words["ENGLISH"]);
 				console.log(code.toString());
 				document.getElementById("words").innerHTML = code.toString();
 				let hdPrivateKey = code.toHDPrivateKey();
