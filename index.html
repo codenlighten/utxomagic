@@ -347,14 +347,13 @@
 						break;
 					}
 					tx.to(receivingAddress, parseInt(splitValue));
-					tx.addOutput(
-						new bsv.Transaction.Output({
-							script: lock,
-							satoshis: 1,
-						})
-					);
 				}
-
+				tx.addOutput(
+					new bsv.Transaction.Output({
+						script: lock,
+						satoshis: 0,
+					})
+				);
 				console.log(tx);
 				tx.sign(privateKey);
 				console.log(tx);
