@@ -201,7 +201,6 @@
 				const Mnemonic = bsv.Mnemonic;
 				let code = new Mnemonic(Mnemonic.Words["ENGLISH"]);
 				console.log(code.toString());
-				document.getElementById("words").innerHTML = code.toString();
 				let hdPrivateKey = code.toHDPrivateKey();
 				let hdPublicKey = hdPrivateKey.hdPublicKey;
 				let address = hdPublicKey.publicKey.toAddress();
