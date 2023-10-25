@@ -334,10 +334,8 @@
 				const tx = new bsv.Transaction().from(filteredUtxos).change(address);
 				tx.feePerKb(50);
 				let totalSatsAvail = tx.inputAmount;
-				const lock = new bsv.Script.empty();
-				lock.add(bsv.Opcode.OP_RETURN);
-				lock.add(Buffer.from("UTXO Magic!", "utf8"));
-				lock.add(Buffer.from("https://utxomagic.com", "utf8"));
+				let lock = new bsv.Script.empty();
+
 				let estFee = tx._estimateFee();
 				const receivingAddress =
 					document.getElementById("receivingAddress").value;
@@ -346,14 +344,18 @@
 						console.log("not enough sats");
 						break;
 					}
-					tx.to(receivingAddress, parseInt(splitValue));
+					lock = new bsv.Script.empty();
+					lock.add(bsv.Opcode.OP_RETURN);
+					//hello world
+					lock.add(Buffer.from("hello world"));
+					tx.addOutput(
+						new bsv.Transaction.Output({
+							script: lock,
+							satoshis: 0,
+						})
+					);
 				}
-				tx.addOutput(
-					new bsv.Transaction.Output({
-						script: lock,
-						satoshis: 1,
-					})
-				);
+
 				console.log(tx);
 				tx.sign(privateKey);
 				console.log(tx);
