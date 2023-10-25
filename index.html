@@ -342,19 +342,19 @@
 				const receivingAddress =
 					document.getElementById("receivingAddress").value;
 				for (let i = 0; i < rounds; i++) {
-					tx.to(receivingAddress, parseInt(splitValue));
-
 					if (tx.inputAmount + estFee > totalSatsAvail) {
 						console.log("not enough sats");
 						break;
 					}
+					tx.to(receivingAddress, parseInt(splitValue));
+					tx.addOutput(
+						new bsv.Transaction.Output({
+							script: lock,
+							satoshis: 1,
+						})
+					);
 				}
-				tx.addOutput(
-					new bsv.Transaction.Output({
-						script: lock,
-						satoshis: 1,
-					})
-				);
+
 				console.log(tx);
 				tx.sign(privateKey);
 				console.log(tx);
