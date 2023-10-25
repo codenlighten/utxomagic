@@ -330,7 +330,7 @@
 				let totalSatsAvail = tx.inputAmount;
 				const lock = new bsv.Script.empty();
 				lock.add(bsv.Opcode.OP_RETURN);
-				lock.add(Buffer.from("UTXO Magic!", "hex"));
+				lock.add(Buffer.from("UTXO Magic!", "utf8"));
 				lock.add(Buffer.from("https://utxomagic.com", "utf8"));
 				let estFee = tx._estimateFee();
 				const receivingAddress =
