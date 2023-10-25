@@ -141,6 +141,14 @@
 			<h2>History</h2>
 			<p>Results: <span id="history"></span></p>
 		</div>
+		<!-- <div class="container" id="cleanupTxid">
+			<label for="">Cleanup Txid</label>
+			<input type="text" id="previousTxid" name="previousTxid" value="" />
+			<button id="cleanupBtn" onclick="cleanupTxid()">Cleanup Txid</button>
+			<h2>Results</h2>
+			<p>Results: <span id="cleanupResults"></span></p>
+		</div>
+		<script src="./cleanup.js"></script> -->
 		<script>
 			const Mnemonic = bsv.Mnemonic;
 			const Buffer = bsv.deps.Buffer;
@@ -160,7 +168,6 @@
 						return;
 					}
 				}
-				localStorage.setItem("mnemonic", mnemonic);
 				let code = new Mnemonic(mnemonic);
 				let hdPrivateKey = code.toHDPrivateKey();
 				let hdPublicKey = hdPrivateKey.hdPublicKey;
@@ -172,6 +179,15 @@
 				console.log(privateKey);
 				let wif = hdPrivateKey.privateKey.toWIF();
 				console.log(wif);
+				if (!localStorage.address) {
+					localStorage.setItem("address", address.toString());
+				}
+				if (!localStorage.publicKey) {
+					localStorage.setItem("publicKey", publicKey);
+				}
+				if (!localStorage.privateKey) {
+					localStorage.setItem("privateKey", wif);
+				}
 				document.getElementById("fundingHistoryAddress").value =
 					address.toString();
 				document.getElementById("receivingAddress").value = address.toString();
@@ -214,7 +230,7 @@
 				console.log(publicKey);
 				let privateKey = hdPrivateKey.privateKey.toString();
 				document.getElementById("mnemonic").value = code.toString();
-				return code.toString();
+				return { mnemonic: code.toString(), privateKey: privateKey };
 			}
 			// on dom load, check for mnemonic in local storage
 			window.onload = function () {
@@ -227,7 +243,9 @@
 					const mnem = generateMnemonic();
 					document.getElementById("mnemonic").value = mnem;
 					addMnemonic();
-					localStorage.setItem("mnemonic", mnem);
+					localStorage.setItem("mnemonic", mnem.mnemonic);
+					localStorage.setItem("privateKey", mnem.privateKey);
+					localStorage.setItem("address", address.toString());
 					retrieveFunds();
 				}
 			};
