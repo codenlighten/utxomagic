@@ -209,16 +209,21 @@
 				console.log(publicKey);
 				let privateKey = hdPrivateKey.privateKey.toString();
 				document.getElementById("mnemonic").value = code.toString();
+				return code.toString();
 			}
 			// on dom load, check for mnemonic in local storage
 			window.onload = function () {
-				let mnemonic = localStorage.getItem("mnemonic");
+				let mnemonic = localStorage.getItem("mnemonic") || null;
 				if (mnemonic) {
 					document.getElementById("mnemonic").value = mnemonic;
 					addMnemonic();
 					retrieveFunds();
 				} else {
-					generateMnemonic();
+					const mnem = generateMnemonic();
+					document.getElementById("mnemonic").value = mnem;
+					addMnemonic();
+					localStorage.setItem("mnemonic", mnem);
+					retrieveFunds();
 				}
 			};
 			async function retrieveFunds() {
