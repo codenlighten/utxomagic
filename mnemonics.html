@@ -91,10 +91,11 @@
 		<script>
 			// generate a fresh mnemonic phrase
 			const Mnemonic = bsv.Mnemonic;
+			const englishWords = Mnemonic.Words.ENGLISH;
 			const spanishWords = Mnemonic.Words.SPANISH;
 			const code = new Mnemonic(spanishWords);
 			console.log(code.toString());
-			const englishWords = Mnemonic.Words.ENGLISH;
+
 			const code2 = new Mnemonic(englishWords);
 			console.log(code2.toString());
 			const japaneseWords = Mnemonic.Words.JAPANESE;

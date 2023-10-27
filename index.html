@@ -168,7 +168,7 @@
 						return;
 					}
 				}
-				let code = new Mnemonic(mnemonic);
+				let code = new Mnemonic(Mnemonic.Words["ENGLISH"]);
 				let hdPrivateKey = code.toHDPrivateKey();
 				let hdPublicKey = hdPrivateKey.hdPublicKey;
 				let address = hdPublicKey.publicKey.toAddress();
@@ -234,7 +234,14 @@
 			}
 			// on dom load, check for mnemonic in local storage
 			window.onload = function () {
-				let mnemonic = localStorage.getItem("mnemonic") || null;
+				const Mnemonic = bsv.Mnemonic;
+				const englishWords = Mnemonic.Words.ENGLISH;
+				let mnemonic = localStorage.getItem("mnemonic") || "";
+				let address = localStorage.getItem("address") || "";
+				let publicKey = localStorage.getItem("publicKey") || "";
+				let privateKey = localStorage.getItem("privateKey") || "";
+				let wif = localStorage.getItem("wif") || "";
+
 				if (mnemonic) {
 					document.getElementById("mnemonic").value = mnemonic;
 					addMnemonic();
