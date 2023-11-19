@@ -340,10 +340,10 @@
 					(acc, utxo) => acc + utxo.satoshis,
 					0
 				);
-				if (totalAvailable < totalToSplit) {
-					alert("Not enough sats to split");
-					return;
-				}
+				// if (totalAvailable < totalToSplit) {
+				// 	alert("Not enough sats to split");
+				// 	return;
+				// }
 
 				// Prepare Transaction
 				const tx = new bsv.Transaction().from(filteredUtxos);
