@@ -365,14 +365,14 @@
 					tx.to(receivingAddress, splitValue);
 				}
 
-				// Calculate and Set Fees
-				const feePerKB = 15; // This can be dynamically fetched or adjusted
-				tx.feePerKb(feePerKB);
-				const estimatedFee = tx._estimateFee();
-				tx.change(address);
+				const size = tx._estimateSize();
+				const fee = Math.ceil(0.01 * size);
+				console.log(fee, size, totalAvailable);
+				// Add Change Output
+				tx.to(address, totalAvailable - fee - splitValue * rounds);
 				// Sign and Send Transaction
 				tx.sign(privateKey);
-				if (totalAvailable < estimatedFee) {
+				if (totalAvailable < tx._estimateFee()) {
 					alert("You do not have enough sats to split");
 					return;
 				}
@@ -423,10 +423,10 @@
 					return;
 				}
 				const tx = new bsv.Transaction().from(utxoArray);
-				tx.to(receiver, parseInt(amount));
-				const feePerKB = 15; // This can be dynamically fetched or adjusted
-				tx.feePerKb(feePerKB);
-				tx.change(address);
+				const size = tx._estimateSize();
+				const fee = Math.ceil(0.01 * size);
+				console.log(fee, size, amount, totalAvailable);
+				tx.to(receiver, parseInt(amount) - fee);
 				tx.sign(privateKey);
 				if (totalAvailable < tx._estimateFee()) {
 					alert("You do not have enough sats to send");
