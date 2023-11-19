@@ -425,9 +425,9 @@
 					return;
 				}
 				const tx = new bsv.Transaction().from(utxoArray);
-				tx.feePerKb(10);
+				tx.feePerKb(50);
 				const size = tx._estimateSize();
-				const fee = Math.ceil(0.01 * size);
+				const fee = Math.ceil(0.05 * size);
 				console.log(fee, size, amount, totalAvailable, tx._estimateFee());
 				tx.to(receiver, parseInt(amount) - fee);
 				tx.sign(privateKey);
