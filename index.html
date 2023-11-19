@@ -339,7 +339,7 @@
 
 				// Prepare Transaction
 				const tx = new bsv.Transaction().from(utxoArray);
-				tx.feePerKb(50);
+				tx.feePerKb(10);
 				const receivingAddress =
 					document.getElementById("receivingAddress").value;
 				//add safe data with op return
@@ -359,7 +359,7 @@
 				}
 
 				const size = tx._estimateSize();
-				const fee = Math.ceil(0.05 * size);
+				const fee = Math.ceil(0.01 * size);
 				console.log(fee, size, totalAvailable, tx._estimateFee());
 				// Add Change Output
 				// if (totalAvailable < tx._estimateFee()) {
@@ -420,17 +420,18 @@
 					0
 				);
 				console.log(totalAvailable, amount);
-				// if (totalAvailable < parseInt(amount)) {
-				// 	alert("Not enough sats to send");
-				// 	return;
-				// }
+
 				const tx = new bsv.Transaction().from(utxoArray);
 				tx.feePerKb(50);
-				// const size = tx._estimateSize();
-				// const fee = Math.ceil(0.05 * size);
-				// console.log(fee, size, amount, totalAvailable, tx._estimateFee());
+				const size = tx._estimateSize();
+				const fee = Math.ceil(0.01 * size);
+				console.log(fee, size, amount, totalAvailable, tx._estimateFee());
 				tx.to(receiver, parseInt(amount));
 				tx.change(address);
+				if (totalAvailable < tx._estimateFee()) {
+					alert(`You do not have enough sats to send. You need ${fee} sats`);
+					return;
+				}
 				tx.sign(privateKey);
 
 				const txHex = tx.toString();
