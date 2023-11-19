@@ -430,7 +430,6 @@
 				const fee = Math.ceil(0.05 * size);
 				console.log(fee, size, amount, totalAvailable, tx._estimateFee());
 				tx.to(receiver, parseInt(amount) - fee);
-				tx.sign(privateKey);
 				if (totalAvailable < tx._estimateFee()) {
 					alert("You do not have enough sats to send");
 					//change amount to total available - fee
@@ -438,6 +437,11 @@
 						totalAvailable - tx._estimateFee();
 					return;
 				}
+				if (totalAvailable - fee - parseInt(amount) > 0) {
+					tx.to(address, totalAvailable - fee - parseInt(amount));
+				}
+				tx.sign(privateKey);
+
 				const txHex = tx.toString();
 				const response = await fetch(
 					"https://api.whatsonchain.com/v1/bsv/main/tx/raw",
