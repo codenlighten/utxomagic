@@ -419,6 +419,7 @@
 					(acc, utxo) => acc + utxo.satoshis,
 					0
 				);
+				console.log(totalAvailable, amount);
 				if (totalAvailable < parseInt(amount)) {
 					alert("Not enough sats to send");
 					return;
@@ -429,16 +430,7 @@
 				const fee = Math.ceil(0.05 * size);
 				console.log(fee, size, amount, totalAvailable, tx._estimateFee());
 				tx.to(receiver, parseInt(amount));
-				if (totalAvailable < tx._estimateFee()) {
-					alert("You do not have enough sats to send");
-					//change amount to total available - fee
-					document.getElementById("sendAmount").value =
-						totalAvailable - tx._estimateFee();
-					return;
-				}
-				if (totalAvailable - fee - parseInt(amount) > 0) {
-					tx.to(address, totalAvailable - fee - parseInt(amount));
-				}
+				tx.change(address);
 				tx.sign(privateKey);
 
 				const txHex = tx.toString();
