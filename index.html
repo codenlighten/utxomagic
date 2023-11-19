@@ -3,12 +3,12 @@
 	<head>
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<title>BSV UXO MAGIC- UTXO SPLITTER</title>
+		<title>BSV UTXO MAGIC- UTXO SPLITTER</title>
 		<!-- twitter card -->
 		<meta name="twitter:card" content="summary_large_image" />
 		<meta name="twitter:site" content="@utxomagic" />
 		<meta name="twitter:creator" content="@utxomagic" />
-		<meta name="twitter:title" content="BSV UXO MAGIC- UTXO SPLITTER" />
+		<meta name="twitter:title" content="BSV UTXO MAGIC- UTXO SPLITTER" />
 		<meta
 			name="twitter:description"
 			content="Split your UTXOs into smaller UTXOs"
@@ -173,14 +173,7 @@
 			<label for="">Reset Mnemonics</label>
 			<button id="resetBtn" onclick="resetMnemonics()">Reset Mnemonics</button>
 		</div>
-		<!-- <div class="container" id="cleanupTxid">
-			<label for="">Cleanup Txid</label>
-			<input type="text" id="previousTxid" name="previousTxid" value="" />
-			<button id="cleanupBtn" onclick="cleanupTxid()">Cleanup Txid</button>
-			<h2>Results</h2>
-			<p>Results: <span id="cleanupResults"></span></p>
-		</div>
-		<script src="./cleanup.js"></script> -->
+
 		<script>
 			const Mnemonic = bsv.Mnemonic;
 			const Buffer = bsv.deps.Buffer;
@@ -392,14 +385,6 @@
 				const size = tx._estimateSize();
 				const fee = Math.ceil(0.015 * size);
 				console.log(fee, size, totalAvailable, tx._estimateFee());
-				// Add Change Output
-				// if (totalAvailable < tx._estimateFee()) {
-				// 	alert(`You do not have enough sats to send. You need ${fee} sats`);
-				// 	return;
-				// }
-				// if (totalAvailable - tx._estimateFee() > 0) {
-				// 	tx.to(address, totalAvailable - tx._estimateFee());
-				// }
 				tx.fee(fee);
 				tx.change(address);
 				if (totalAvailable < tx._estimateFee()) {
