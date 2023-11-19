@@ -320,6 +320,8 @@
 				const splitValue = parseInt(
 					document.getElementById("splitValue").value
 				);
+				let totalSplitAmt = rounds * splitValue;
+				let split = 0;
 				// Fetch UTXOs
 				let utxos = await fetch(
 					`https://api.whatsonchain.com/v1/bsv/main/address/${address}/unspent`
@@ -338,7 +340,7 @@
 				);
 
 				// Prepare Transaction
-				const tx = new bsv.Transaction().from(utxoArray);
+				const tx = new bsv.Transaction();
 
 				const receivingAddress =
 					document.getElementById("receivingAddress").value;
@@ -356,6 +358,17 @@
 				console.log(splitValue, rounds);
 				for (let i = 0; i < rounds; i++) {
 					tx.to(receivingAddress, splitValue);
+				}
+				//while split is less than total split amount add utxos
+				while (split < tx._estimateFee()) {
+					// Add UTXOs
+					for (let i = 0; i < utxoArray.length; i++) {
+						tx.from(utxoArray[i]);
+						split += utxoArray[i].satoshis;
+						if (split >= tx._estimateFee()) {
+							break;
+						}
+					}
 				}
 
 				const size = tx._estimateSize();
