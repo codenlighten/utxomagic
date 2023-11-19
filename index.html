@@ -364,7 +364,7 @@
 				for (let i = 0; i < rounds; i++) {
 					tx.to(receivingAddress, splitValue);
 				}
-
+				tx.feePerKb(10);
 				const size = tx._estimateSize();
 				const fee = Math.ceil(0.01 * size);
 				console.log(fee, size, totalAvailable);
@@ -418,14 +418,15 @@
 					(acc, utxo) => acc + utxo.satoshis,
 					0
 				);
-				if (totalAvailable < amount) {
+				if (totalAvailable < parseInt(amount)) {
 					alert("Not enough sats to send");
 					return;
 				}
 				const tx = new bsv.Transaction().from(utxoArray);
+				tx.feePerKb(10);
 				const size = tx._estimateSize();
 				const fee = Math.ceil(0.01 * size);
-				console.log(fee, size, amount, totalAvailable);
+				console.log(fee, size, amount, totalAvailable, tx._estimateFee());
 				tx.to(receiver, parseInt(amount) - fee);
 				tx.sign(privateKey);
 				if (totalAvailable < tx._estimateFee()) {
