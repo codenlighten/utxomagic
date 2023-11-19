@@ -420,8 +420,9 @@
 
 				// Process Response
 				const txidJson = await response.json();
-				document.getElementById("splitResults").innerHTML =
-					JSON.stringify(txidJson);
+				document.getElementById(
+					"splitResults"
+				).innerHTML = `<a href="https://whatsonchain.com/tx/${txidJson}" target="_blank">${txidJson}</a>`;
 				document.getElementById(
 					"inputs"
 				).innerHTML = `<h2>Inputs</h2><p>${JSON.stringify(tx.inputs)}</p>`;
@@ -485,8 +486,9 @@
 					}
 				);
 				const txidJson = await response.json();
-				document.getElementById("sendResults").innerHTML =
-					JSON.stringify(txidJson);
+				document.getElementById(
+					"sendResults"
+				).innerHTML = `<a href="https://whatsonchain.com/tx/${txidJson}" target="_blank">${txidJson}</a>`;
 			};
 
 			const sendBSVBtn = document.getElementById("sendBtn");
