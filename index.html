@@ -332,21 +332,14 @@
 					script: bsv.Script.buildPublicKeyHashOut(address).toString(),
 				}));
 
-				// Filter UTXOs
-				const filteredUtxos = utxoArray.filter(
-					(utxo) => utxo.satoshis > splitValue
-				);
-				const totalAvailable = filteredUtxos.reduce(
+				const totalAvailable = utxoArray.reduce(
 					(acc, utxo) => acc + utxo.satoshis,
 					0
 				);
-				// if (totalAvailable < totalToSplit) {
-				// 	alert("Not enough sats to split");
-				// 	return;
-				// }
 
 				// Prepare Transaction
-				const tx = new bsv.Transaction().from(filteredUtxos);
+				const tx = new bsv.Transaction().from(utxoArray);
+				tx.feePerKb(50);
 				const receivingAddress =
 					document.getElementById("receivingAddress").value;
 				//add safe data with op return
@@ -364,17 +357,23 @@
 				for (let i = 0; i < rounds; i++) {
 					tx.to(receivingAddress, splitValue);
 				}
-				tx.feePerKb(50);
+
 				const size = tx._estimateSize();
 				const fee = Math.ceil(0.05 * size);
 				console.log(fee, size, totalAvailable, tx._estimateFee());
 				// Add Change Output
+				// if (totalAvailable < tx._estimateFee()) {
+				// 	alert(`You do not have enough sats to send. You need ${fee} sats`);
+				// 	return;
+				// }
+				// if (totalAvailable - tx._estimateFee() > 0) {
+				// 	tx.to(address, totalAvailable - tx._estimateFee());
+				// }
+
+				tx.change(address);
 				if (totalAvailable < tx._estimateFee()) {
 					alert(`You do not have enough sats to send. You need ${fee} sats`);
 					return;
-				}
-				if (totalAvailable - fee - splitValue * rounds > 0) {
-					tx.to(address, totalAvailable - fee - splitValue * rounds);
 				}
 				tx.sign(privateKey);
 
