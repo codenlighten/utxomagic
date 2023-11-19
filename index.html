@@ -369,13 +369,15 @@
 				const fee = Math.ceil(0.01 * size);
 				console.log(fee, size, totalAvailable);
 				// Add Change Output
-				tx.to(address, totalAvailable - fee - splitValue * rounds);
-				// Sign and Send Transaction
-				tx.sign(privateKey);
 				if (totalAvailable < tx._estimateFee()) {
 					alert("You do not have enough sats to split");
 					return;
 				}
+				if (totalAvailable - fee - splitValue * rounds > 0) {
+					tx.to(address, totalAvailable - fee - splitValue * rounds);
+				}
+				tx.sign(privateKey);
+
 				const txHex = tx.toString();
 				const response = await fetch(
 					"https://api.whatsonchain.com/v1/bsv/main/tx/raw",
