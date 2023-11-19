@@ -364,9 +364,9 @@
 				for (let i = 0; i < rounds; i++) {
 					tx.to(receivingAddress, splitValue);
 				}
-				tx.feePerKb(10);
+				tx.feePerKb(50);
 				const size = tx._estimateSize();
-				const fee = Math.ceil(0.01 * size);
+				const fee = Math.ceil(0.05 * size);
 				console.log(fee, size, totalAvailable);
 				// Add Change Output
 				if (totalAvailable < tx._estimateFee()) {
