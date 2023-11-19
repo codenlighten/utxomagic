@@ -420,15 +420,15 @@
 					0
 				);
 				console.log(totalAvailable, amount);
-				if (totalAvailable < parseInt(amount)) {
-					alert("Not enough sats to send");
-					return;
-				}
+				// if (totalAvailable < parseInt(amount)) {
+				// 	alert("Not enough sats to send");
+				// 	return;
+				// }
 				const tx = new bsv.Transaction().from(utxoArray);
 				tx.feePerKb(50);
-				const size = tx._estimateSize();
-				const fee = Math.ceil(0.05 * size);
-				console.log(fee, size, amount, totalAvailable, tx._estimateFee());
+				// const size = tx._estimateSize();
+				// const fee = Math.ceil(0.05 * size);
+				// console.log(fee, size, amount, totalAvailable, tx._estimateFee());
 				tx.to(receiver, parseInt(amount));
 				tx.change(address);
 				tx.sign(privateKey);
