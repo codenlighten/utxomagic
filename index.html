@@ -339,7 +339,7 @@
 
 				// Prepare Transaction
 				const tx = new bsv.Transaction().from(utxoArray);
-				tx.feePerKb(10);
+
 				const receivingAddress =
 					document.getElementById("receivingAddress").value;
 				//add safe data with op return
@@ -369,7 +369,7 @@
 				// if (totalAvailable - tx._estimateFee() > 0) {
 				// 	tx.to(address, totalAvailable - tx._estimateFee());
 				// }
-
+				tx.fee(fee);
 				tx.change(address);
 				if (totalAvailable < tx._estimateFee()) {
 					alert(`You do not have enough sats to send. You need ${fee} sats`);
