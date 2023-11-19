@@ -343,7 +343,7 @@
 				const receivingAddress =
 					document.getElementById("receivingAddress").value;
 				//add safe data with op return
-				if (safeData) {
+				if (safeData.length > 0) {
 					tx.addOutput(
 						new bsv.Transaction.Output({
 							script: bsv.Script.buildSafeDataOut([safeData]),
