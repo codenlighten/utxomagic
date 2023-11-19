@@ -446,9 +446,8 @@
 					})
 				);
 				tx.to(receiver, parseInt(amount));
-				const size = tx._estimateSize();
-				const fee = Math.ceil(0.015 * size);
-				tx.feePerKb(10);
+
+				tx.feePerKb(50);
 
 				console.log(fee, size, amount, totalAvailable, tx._estimateFee());
 				let utxoUsed = 0;
