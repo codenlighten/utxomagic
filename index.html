@@ -433,6 +433,7 @@
 				tx.to(receiver, parseInt(amount));
 				const size = tx._estimateSize();
 				const fee = Math.ceil(0.01 * size);
+				tx.feePerKb(10);
 				tx.fee(fee);
 				console.log(fee, size, amount, totalAvailable, tx._estimateFee());
 
