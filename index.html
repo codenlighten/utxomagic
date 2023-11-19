@@ -110,10 +110,10 @@
 			<p>Results: <span id="utxos"></span></p>
 		</div>
 		<div class="container" id="splitUtxos">
-			<label for="">Value of UTXO Splits</label>
+			<label for="">Value of Each UTXO</label>
 			<input type="text" id="splitValue" name="splitValue" value="" />
-			<label for="" id="totalToSplit">Total Amount of Sats to Send</label>
-			<input type="text" id="totalToSplit" name="totalToSplit" value="" />
+			<label for="" id="totalToSplit">Total Amount of UTXOS to Split</label>
+			<input type="text" id="rounds" name="rounds" value="" />
 			<!-- add safe data -->
 			<label for="">Add Message?</label>
 			<input type="text" id="safeData" name="safeData" value="" />
@@ -152,6 +152,20 @@
 		<script>
 			const Mnemonic = bsv.Mnemonic;
 			const Buffer = bsv.deps.Buffer;
+
+			function generateAddressFromMnemonic(mnemonic) {
+				let code = new Mnemonic(mnemonic);
+				let hdPrivateKey = code.toHDPrivateKey();
+				let hdPublicKey = hdPrivateKey.hdPublicKey;
+				let address = hdPublicKey.publicKey.toAddress();
+				return {
+					address: address.toString(),
+					publicKey: hdPublicKey.publicKey.toString(),
+					privateKey: hdPrivateKey.privateKey.toString(),
+					wif: hdPrivateKey.privateKey.toWIF(),
+				};
+			}
+
 			function addMnemonic() {
 				let mnemonic =
 					document.getElementById("mnemonic").value ||
@@ -168,34 +182,24 @@
 						return;
 					}
 				}
-				let code = new Mnemonic(Mnemonic.Words["ENGLISH"]);
-				let hdPrivateKey = code.toHDPrivateKey();
-				let hdPublicKey = hdPrivateKey.hdPublicKey;
-				let address = hdPublicKey.publicKey.toAddress();
-				console.log(address.toString());
-				let publicKey = hdPublicKey.publicKey.toString();
-				console.log(publicKey);
-				let privateKey = hdPrivateKey.privateKey.toString();
-				console.log(privateKey);
-				let wif = hdPrivateKey.privateKey.toWIF();
-				console.log(wif);
-				if (!localStorage.address) {
-					localStorage.setItem("address", address.toString());
-				}
-				if (!localStorage.publicKey) {
-					localStorage.setItem("publicKey", publicKey);
-				}
-				if (!localStorage.privateKey) {
-					localStorage.setItem("privateKey", wif);
-				}
-				document.getElementById("fundingHistoryAddress").value =
-					address.toString();
-				document.getElementById("receivingAddress").value = address.toString();
-				document.getElementById("fundingAddress").value = address.toString();
-				document.getElementById("address").innerHTML = address.toString();
-				document.getElementById("publicKey").innerHTML = publicKey;
-				document.getElementById("privateKey").innerHTML = privateKey;
-				document.getElementById("wif").innerHTML = wif;
+
+				localStorage.setItem("mnemonic", mnemonic);
+				let keys = generateAddressFromMnemonic(mnemonic);
+
+				// Set the values to local storage and UI
+				localStorage.setItem("address", keys.address);
+				localStorage.setItem("publicKey", keys.publicKey);
+				localStorage.setItem("privateKey", keys.privateKey);
+				localStorage.setItem("wif", keys.wif);
+
+				// Updating UI elements
+				document.getElementById("fundingHistoryAddress").value = keys.address;
+				document.getElementById("receivingAddress").value = keys.address;
+				document.getElementById("fundingAddress").value = keys.address;
+				document.getElementById("address").innerHTML = keys.address;
+				document.getElementById("publicKey").innerHTML = keys.publicKey;
+				document.getElementById("privateKey").innerHTML = keys.privateKey;
+				document.getElementById("wif").innerHTML = keys.wif;
 				//onclick to hide
 				document.getElementById("addMnemonicBtn").innerHTML = "Hide Mnemonic";
 				//hide mnemonic, private key, public key, wif
@@ -219,42 +223,20 @@
 				};
 			}
 			function generateMnemonic() {
-				const Mnemonic = bsv.Mnemonic;
 				let code = new Mnemonic(Mnemonic.Words["ENGLISH"]);
-				console.log(code.toString());
-				let hdPrivateKey = code.toHDPrivateKey();
-				let hdPublicKey = hdPrivateKey.hdPublicKey;
-				let address = hdPublicKey.publicKey.toAddress();
-				console.log(address.toString());
-				let publicKey = hdPublicKey.publicKey.toString();
-				console.log(publicKey);
-				let privateKey = hdPrivateKey.privateKey.toString();
 				document.getElementById("mnemonic").value = code.toString();
-				return { mnemonic: code.toString(), privateKey: privateKey };
+				return {
+					mnemonic: code.toString(),
+					privateKey: code.toHDPrivateKey().privateKey.toString(),
+				};
 			}
 			// on dom load, check for mnemonic in local storage
 			window.onload = function () {
-				const Mnemonic = bsv.Mnemonic;
-				const englishWords = Mnemonic.Words.ENGLISH;
-				let mnemonic = localStorage.getItem("mnemonic") || "";
-				let address = localStorage.getItem("address") || "";
-				let publicKey = localStorage.getItem("publicKey") || "";
-				let privateKey = localStorage.getItem("privateKey") || "";
-				let wif = localStorage.getItem("wif") || "";
-
-				if (mnemonic) {
-					document.getElementById("mnemonic").value = mnemonic;
-					addMnemonic();
-					retrieveFunds();
-				} else {
-					const mnem = generateMnemonic();
-					document.getElementById("mnemonic").value = mnem;
-					addMnemonic();
-					localStorage.setItem("mnemonic", mnem.mnemonic);
-					localStorage.setItem("privateKey", mnem.privateKey);
-					localStorage.setItem("address", address.toString());
-					retrieveFunds();
-				}
+				let mnemonic =
+					localStorage.getItem("mnemonic") || generateMnemonic().mnemonic;
+				document.getElementById("mnemonic").value = mnemonic;
+				addMnemonic();
+				retrieveFunds();
 			};
 			async function retrieveFunds() {
 				let address = document.getElementById("fundingAddress").value;
@@ -313,89 +295,84 @@
 			}
 
 			async function splitUtxos() {
-				let mnemonic =
-					document.getElementById("mnemonic").value ||
-					localStorage.getItem("mnemonic");
-				let code = new Mnemonic(mnemonic);
-				let hdPrivateKey = code.toHDPrivateKey();
-				let hdPublicKey = hdPrivateKey.hdPublicKey;
-				let address = hdPublicKey.publicKey.toAddress();
-				console.log(address.toString());
-				let publicKey = hdPublicKey.publicKey.toString();
-				console.log(publicKey);
-				let privateKey = hdPrivateKey.privateKey.toString();
-				console.log(privateKey);
-				let totalToSplit = document.getElementById("totalToSplit").value;
+				let address = document.getElementById("fundingAddress").value;
+				let privateKey = document.getElementById("privateKey").innerHTML;
+				const rounds = parseInt(document.getElementById("rounds").value);
 				const safeData = document.getElementById("safeData").value;
-				let splitValue = document.getElementById("splitValue").value;
+				const splitValue = parseInt(
+					document.getElementById("splitValue").value
+				);
+				// Fetch UTXOs
 				let utxos = await fetch(
 					`https://api.whatsonchain.com/v1/bsv/main/address/${address}/unspent`
 				);
-				console.log(utxos);
 				let utxosJson = await utxos.json();
-				let utxoArray = [];
-				for (let i = 0; i < utxosJson.length; i++) {
-					let utxo = utxosJson[i];
-					let txid = utxo.tx_hash;
-					let vout = utxo.tx_pos;
-					let satoshis = utxo.value;
-					let utxoObj = {
-						txid: txid,
-						vout: vout,
-						satoshis: satoshis,
-						script: bsv.Script.buildPublicKeyHashOut(address).toString(),
-					};
-					utxoArray.push(utxoObj);
-				}
-				const filteredUtxos = utxoArray.filter((utxo) => {
-					return utxo.satoshis > parseInt(splitValue);
-				});
-				const totalFilterdUtxos = filteredUtxos.reduce((a, b) => {
-					return a + b.satoshis;
-				}, 0);
-				if (totalFilterdUtxos < parseInt(totalToSplit)) {
+				let utxoArray = utxosJson.map((utxo) => ({
+					txid: utxo.tx_hash,
+					vout: utxo.tx_pos,
+					satoshis: utxo.value,
+					script: bsv.Script.buildPublicKeyHashOut(address).toString(),
+				}));
+
+				// Filter UTXOs
+				const filteredUtxos = utxoArray.filter(
+					(utxo) => utxo.satoshis > splitValue
+				);
+				const totalAvailable = filteredUtxos.reduce(
+					(acc, utxo) => acc + utxo.satoshis,
+					0
+				);
+				if (totalAvailable < totalToSplit) {
 					alert("Not enough sats to split");
 					return;
 				}
 
-				const rounds = Math.floor(totalFilterdUtxos / splitValue);
-				const tx = new bsv.Transaction().from(filteredUtxos).change(address);
-				tx.feePerKb(50);
-				let totalSatsAvail = tx.inputAmount;
-				let lock = new bsv.Script.empty();
-				let total = 0;
-				let estFee = tx._estimateFee();
+				// Prepare Transaction
+				const tx = new bsv.Transaction().from(filteredUtxos);
 				const receivingAddress =
 					document.getElementById("receivingAddress").value;
-				for (let i = 0; i < rounds; i++) {
-					if (safeData) {
-						tx.addData(Buffer.from(safeData));
-					}
-					tx.to(receivingAddress, parseInt(splitValue));
-					total += parseInt(splitValue);
-					if (total > totalToSplit) {
-						break;
-					}
+				//add safe data with op return
+				if (safeData) {
+					tx.addOutput(
+						new bsv.Transaction.Output({
+							script: bsv.Script.buildSafeDataOut([safeData]),
+							satoshis: 0,
+						})
+					);
 				}
 
-				console.log(tx);
+				// Add Outputs
+				console.log(splitValue, rounds);
+				for (let i = 0; i < rounds; i++) {
+					tx.to(receivingAddress, splitValue);
+				}
+
+				// Calculate and Set Fees
+				const feePerKB = 15; // This can be dynamically fetched or adjusted
+				tx.feePerKb(feePerKB);
+				const estimatedFee = tx._estimateFee();
+				tx.change(address);
+				// Sign and Send Transaction
 				tx.sign(privateKey);
-				console.log(tx);
-				const txid = await fetch(
+				if (totalAvailable > estimatedFee) {
+					alert("You have enough sats to split");
+				} else {
+					alert("You do not have enough sats to split");
+				}
+				const txHex = tx.toString();
+				const response = await fetch(
 					"https://api.whatsonchain.com/v1/bsv/main/tx/raw",
 					{
 						method: "POST",
-						body: JSON.stringify({ txhex: tx.toString() }),
-						headers: {
-							"Content-Type": "application/json",
-						},
+						body: JSON.stringify({ txhex: txHex }),
+						headers: { "Content-Type": "application/json" },
 					}
 				);
-				const txidJson = await txid.json();
-				console.log(txidJson);
-				document.getElementById("splitResults").innerHTML = `${JSON.stringify(
-					txidJson
-				)}`;
+
+				// Process Response
+				const txidJson = await response.json();
+				document.getElementById("splitResults").innerHTML =
+					JSON.stringify(txidJson);
 				document.getElementById(
 					"inputs"
 				).innerHTML = `<h2>Inputs</h2><p>${JSON.stringify(tx.inputs)}</p>`;
