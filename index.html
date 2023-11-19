@@ -359,7 +359,7 @@
 				}
 
 				const size = tx._estimateSize();
-				const fee = Math.ceil(0.01 * size);
+				const fee = Math.ceil(0.015 * size);
 				console.log(fee, size, totalAvailable, tx._estimateFee());
 				// Add Change Output
 				// if (totalAvailable < tx._estimateFee()) {
@@ -432,7 +432,7 @@
 				);
 				tx.to(receiver, parseInt(amount));
 				const size = tx._estimateSize();
-				const fee = Math.ceil(0.01 * size);
+				const fee = Math.ceil(0.015 * size);
 				tx.feePerKb(10);
 				tx.fee(fee);
 				console.log(fee, size, amount, totalAvailable, tx._estimateFee());
