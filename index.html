@@ -368,10 +368,9 @@
 				tx.change(address);
 				// Sign and Send Transaction
 				tx.sign(privateKey);
-				if (totalAvailable > estimatedFee) {
-					alert("You have enough sats to split");
-				} else {
+				if (totalAvailable < estimatedFee) {
 					alert("You do not have enough sats to split");
+					return;
 				}
 				const txHex = tx.toString();
 				const response = await fetch(
@@ -399,6 +398,7 @@
 				const receiver = document.getElementById("sendAddress").value;
 				const amount = document.getElementById("sendAmount").value;
 				const privateKey = document.getElementById("privateKey").innerHTML;
+				const address = document.getElementById("address").innerHTML;
 				const utxos = await fetch(
 					`https://api.whatsonchain.com/v1/bsv/main/address/${address}/unspent`
 				);
@@ -419,16 +419,15 @@
 					return;
 				}
 				const tx = new bsv.Transaction().from(utxoArray);
-				tx.to(receiver, amount);
+				tx.to(receiver, parseInt(amount));
 				const feePerKB = 15; // This can be dynamically fetched or adjusted
 				tx.feePerKb(feePerKB);
 				const estimatedFee = tx._estimateFee();
 				tx.change(address);
 				tx.sign(privateKey);
-				if (totalAvailable > estimatedFee) {
-					alert("You have enough sats to send");
-				} else {
+				if (totalAvailable < estimatedFee) {
 					alert("You do not have enough sats to send");
+					return;
 				}
 				const txHex = tx.toString();
 				const response = await fetch(
