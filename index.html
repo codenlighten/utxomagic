@@ -448,8 +448,8 @@
 				tx.to(receiver, parseInt(amount));
 				const size = tx._estimateSize();
 				const fee = Math.ceil(0.015 * size);
-				// tx.feePerKb(10);
-				tx.fee(fee);
+				tx.feePerKb(10);
+
 				console.log(fee, size, amount, totalAvailable, tx._estimateFee());
 				let utxoUsed = 0;
 				for (let i = 0; i < utxoArray.length; i++) {
