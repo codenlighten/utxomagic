@@ -367,10 +367,10 @@
 				tx.feePerKb(50);
 				const size = tx._estimateSize();
 				const fee = Math.ceil(0.05 * size);
-				console.log(fee, size, totalAvailable);
+				console.log(fee, size, totalAvailable, tx._estimateFee());
 				// Add Change Output
 				if (totalAvailable < tx._estimateFee()) {
-					alert("You do not have enough sats to split");
+					alert(`You do not have enough sats to send. You need ${fee} sats`);
 					return;
 				}
 				if (totalAvailable - fee - splitValue * rounds > 0) {
