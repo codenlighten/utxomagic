@@ -423,11 +423,19 @@
 
 				const tx = new bsv.Transaction().from(utxoArray);
 				// tx.feePerKb(50);
+				// add safe data with "UTXO MAGIC"
+				tx.addOutput(
+					new bsv.Transaction.Output({
+						script: bsv.Script.buildSafeDataOut(["UTXO MAGIC"]),
+						satoshis: 0,
+					})
+				);
+				tx.to(receiver, parseInt(amount));
 				const size = tx._estimateSize();
 				const fee = Math.ceil(0.01 * size);
 				tx.fee(fee);
 				console.log(fee, size, amount, totalAvailable, tx._estimateFee());
-				tx.to(receiver, parseInt(amount));
+
 				tx.change(address);
 				if (totalAvailable < tx._estimateFee()) {
 					alert(`You do not have enough sats to send. You need ${fee} sats`);
