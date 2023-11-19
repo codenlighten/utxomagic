@@ -141,6 +141,14 @@
 			<h2>History</h2>
 			<p>Results: <span id="history"></span></p>
 		</div>
+		<div class="container" id="sendBSV">
+			<label for="">Send BSV</label>
+			<input type="text" id="sendAddress" name="address" value="" />
+			<input type="text" id="sendAmount" name="amount" value="" />
+			<button id="sendBtn" onclick="sendBSV()">Send BSV</button>
+			<h2>Results</h2>
+			<p>Results: <span id="sendResults"></span></p>
+		</div>
 		<!-- <div class="container" id="cleanupTxid">
 			<label for="">Cleanup Txid</label>
 			<input type="text" id="previousTxid" name="previousTxid" value="" />
@@ -197,6 +205,8 @@
 				document.getElementById("receivingAddress").value = keys.address;
 				document.getElementById("fundingAddress").value = keys.address;
 				document.getElementById("address").innerHTML = keys.address;
+				//send recipient
+				document.getElementById("sendAddress").value = keys.address;
 				document.getElementById("publicKey").innerHTML = keys.publicKey;
 				document.getElementById("privateKey").innerHTML = keys.privateKey;
 				document.getElementById("wif").innerHTML = keys.wif;
@@ -380,6 +390,64 @@
 					"outputs"
 				).innerHTML = `<h2>Outputs</h2><p>${JSON.stringify(tx.outputs)}</p>`;
 			}
+
+			const sendBSV = async () => {
+				const receiver = document.getElementById("sendAddress").value;
+				const amount = document.getElementById("sendAmount").value;
+				const privateKey = document.getElementById("privateKey").innerHTML;
+				const utxos = await fetch(
+					`https://api.whatsonchain.com/v1/bsv/main/address/${address}/unspent`
+				);
+				const utxosJson = await utxos.json();
+				const utxoArray = utxosJson.map((utxo) => ({
+					txid: utxo.tx_hash,
+					vout: utxo.tx_pos,
+					satoshis: utxo.value,
+					script: bsv.Script.buildPublicKeyHashOut(address).toString(),
+				}));
+
+				const totalAvailable = utxoArray.reduce(
+					(acc, utxo) => acc + utxo.satoshis,
+					0
+				);
+				if (totalAvailable < amount) {
+					alert("Not enough sats to send");
+					return;
+				}
+				const tx = new bsv.Transaction().from(utxoArray);
+				tx.to(receiver, amount);
+				const feePerKB = 15; // This can be dynamically fetched or adjusted
+				tx.feePerKb(feePerKB);
+				const estimatedFee = tx._estimateFee();
+				tx.change(address);
+				tx.sign(privateKey);
+				if (totalAvailable > estimatedFee) {
+					alert("You have enough sats to send");
+				} else {
+					alert("You do not have enough sats to send");
+				}
+				const txHex = tx.toString();
+				const response = await fetch(
+					"https://api.whatsonchain.com/v1/bsv/main/tx/raw",
+					{
+						method: "POST",
+						body: JSON.stringify({ txhex: txHex }),
+						headers: { "Content-Type": "application/json" },
+					}
+				);
+				const txidJson = await response.json();
+				document.getElementById("sendResults").innerHTML =
+					JSON.stringify(txidJson);
+				document.getElementById(
+					"inputs"
+				).innerHTML = `<h2>Inputs</h2><p>${JSON.stringify(tx.inputs)}</p>`;
+				document.getElementById(
+					"outputs"
+				).innerHTML = `<h2>Outputs</h2><p>${JSON.stringify(tx.outputs)}</p>`;
+			};
+
+			const sendBSVBtn = document.getElementById("sendBtn");
+			sendBSVBtn.addEventListener("click", sendBSV);
 		</script>
 	</body>
 </html>
