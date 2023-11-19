@@ -151,6 +151,10 @@
 			<h2>Results</h2>
 			<p>Results: <span id="sendResults"></span></p>
 		</div>
+		<div class="container" id="resetMnemonics">
+			<label for="">Reset Mnemonics</label>
+			<button id="resetBtn" onclick="resetMnemonics()">Reset Mnemonics</button>
+		</div>
 		<!-- <div class="container" id="cleanupTxid">
 			<label for="">Cleanup Txid</label>
 			<input type="text" id="previousTxid" name="previousTxid" value="" />
@@ -422,11 +426,13 @@
 				tx.to(receiver, parseInt(amount));
 				const feePerKB = 15; // This can be dynamically fetched or adjusted
 				tx.feePerKb(feePerKB);
-				const estimatedFee = tx._estimateFee();
 				tx.change(address);
 				tx.sign(privateKey);
-				if (totalAvailable < estimatedFee) {
+				if (totalAvailable < tx._estimateFee()) {
 					alert("You do not have enough sats to send");
+					//change amount to total available - fee
+					document.getElementById("sendAmount").value =
+						totalAvailable - tx._estimateFee();
 					return;
 				}
 				const txHex = tx.toString();
@@ -441,16 +447,17 @@
 				const txidJson = await response.json();
 				document.getElementById("sendResults").innerHTML =
 					JSON.stringify(txidJson);
-				document.getElementById(
-					"inputs"
-				).innerHTML = `<h2>Inputs</h2><p>${JSON.stringify(tx.inputs)}</p>`;
-				document.getElementById(
-					"outputs"
-				).innerHTML = `<h2>Outputs</h2><p>${JSON.stringify(tx.outputs)}</p>`;
 			};
 
 			const sendBSVBtn = document.getElementById("sendBtn");
 			sendBSVBtn.addEventListener("click", sendBSV);
+			const resetMnemonics = () => {
+				if (!confirm("Are you sure you want to reset your mnemonics?")) {
+					return;
+				}
+				localStorage.clear();
+				location.reload();
+			};
 		</script>
 	</body>
 </html>
