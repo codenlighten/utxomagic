@@ -426,7 +426,7 @@
 				const size = tx._estimateSize();
 				const fee = Math.ceil(0.01 * size);
 				console.log(fee, size, amount, totalAvailable, tx._estimateFee());
-				tx.to(receiver, parseInt(amount));
+				tx.to(receiver, parseInt(amount) - fee);
 				tx.change(address);
 				if (totalAvailable < tx._estimateFee()) {
 					alert(`You do not have enough sats to send. You need ${fee} sats`);
