@@ -438,9 +438,7 @@
 				);
 				console.log(totalAvailable, amount);
 
-				const tx = new bsv.Transaction().from(utxoArray);
-				// tx.feePerKb(50);
-				// add safe data with "UTXO MAGIC"
+				const tx = new bsv.Transaction();
 				tx.addOutput(
 					new bsv.Transaction.Output({
 						script: bsv.Script.buildSafeDataOut(["UTXO MAGIC"]),
@@ -453,7 +451,14 @@
 				tx.feePerKb(10);
 				tx.fee(fee);
 				console.log(fee, size, amount, totalAvailable, tx._estimateFee());
-
+				let utxoUsed = 0;
+				for (let i = 0; i < utxoArray.length; i++) {
+					tx.from(utxoArray[i]);
+					utxoUsed += utxoArray[i].satoshis;
+					if (utxoUsed >= tx._estimateFee()) {
+						break;
+					}
+				}
 				tx.change(address);
 				if (totalAvailable < tx._estimateFee()) {
 					alert(`You do not have enough sats to send. You need ${fee} sats`);
